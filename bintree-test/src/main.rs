@@ -1,27 +1,55 @@
 use crate::bin_tree::BinTree;
 
 #[allow(dead_code)]
+#[allow(unused_macros)]
 mod bin_tree {
+    #[macro_export]
+    macro_rules! node {
+        (value: $e:expr) => {
+            Some(Box::new(BinTree::new($e)))
+        };
+
+        (value: $v:expr, left: $n:expr) => {
+            Some(Box::new(BinTree{value: $v, left: $n, right: None}))
+        };
+
+        (value: $v:expr, right: $n:expr) => {
+            Some(Box::new(BinTree{value: $v, left: None, right: $n}))
+        };
+
+        (value: $v:expr, left: $ln:expr, right: $rn:expr) => {
+            Some(Box::new(BinTree{value: $v, left: $ln, right: $rn}))
+        };
+
+        (value: $v:expr, right: $ln:expr, left: $rn:expr) => {
+            Some(Box::new(BinTree{value: $v, left: $ln, right: $rn}))
+        };
+
+        (append: $n:expr) => {
+            Some(Box::new($n))
+        }
+    }
+
     #[derive(Debug)]
     pub struct BinTree<T> {
+        pub value: T,
         pub left: Option<Box<BinTree<T>>>,
-        pub right: Option<Box<BinTree<T>>>,
-        pub value: T
+        pub right: Option<Box<BinTree<T>>>
     }
 
     impl<T> BinTree<T> {
         pub fn new(val: T) -> BinTree<T> {
-            BinTree{left: None, right: None, value: val}
+            BinTree{value: val, left: None, right: None}
         }
 
         // Create and add a new node to the left
         pub fn add_left(&mut self, val: T) {
-            self.left = Some(Box::new(BinTree{left: None, right: None, value: val}));
+            self.left = Some(Box::new(BinTree{value: val, left: None, right: None}));
         }
 
         // Create and add a new node to the right
         pub fn add_right(&mut self, val: T) {
-            self.right = Some(Box::new(BinTree{left: None, right: None, value: val}));
+            self.right = Some(Box::new(BinTree{value: val, left: None, right: None}));
         }
 
         // Append an existing node to the left
@@ -65,4 +93,27 @@ fn main() {
 
     a.remove_left();
     println!("\n\n\n{:#?}", a);
+
+    let c = node!{
+        value: 4,
+
+        left: node!{
+            value: 5
+        },
+
+        right: node!{
+            value: 6,
+
+            left: node!{
+                value: 7
+            },
+
+            right: node!{
+                value: 8,
+                left: node!(append: a) // appending already existing BinTree
+            }
+        }
+    }.unwrap();
+
+    println!("\n\n\n{:#?}", c);
 }
